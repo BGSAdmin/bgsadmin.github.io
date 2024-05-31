@@ -1,0 +1,83 @@
+/* Resetting default margin and padding */
+body, h1, h2, h3, h4, p {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+/* Header styling */
+header {
+    background: linear-gradient(to right, #2193b0, #6dd5ed); /* Gradient: Blue to Light Blue */
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+}
+
+/* Main content styling */
+#about, #products, #contact {
+    margin: 20px;
+}
+
+/* Product box styling */
+.product-box {
+    border: 1px solid #ccc;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: #fff; /* White */
+    border-radius: 20px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    transition: transform 0.3s ease-in-out;
+}
+
+.product-box:hover {
+    transform: translateY(-5px); /* Lift on hover */
+}
+
+/* Product title styling */
+.product h3 {
+    color: #333;
+    font-size: 1.6em;
+    margin-bottom: 10px;
+}
+
+/* Product link styling */
+.product a {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 12px 24px;
+    background: linear-gradient(to right, #2193b0, #6dd5ed); /* Gradient: Blue to Light Blue */
+    color: #fff;
+    text-decoration: none;
+    border-radius: 30px;
+    box-shadow: 0 5px 15px rgba(33, 147, 176, 0.3); /* Soft shadow */
+    transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.product a:hover {
+    background: linear-gradient(to right, #0b486b, #2193b0); /* Gradient: Dark Blue to Blue on hover */
+    transform: scale(1.05); /* Scale on hover */
+}
+
+/* VHUMI details styling */
+.vhumi-details {
+    margin-top: 15px;
+}
+
+/* Image styling */
+.images {
+    margin-top: 15px;
+}
+
+.images img {
+    width: 100%;
+    margin-bottom: 10px;
+    border-radius: 20px;
+}
+
+/* Footer styling */
+footer {
+    background: linear-gradient(to right, #2193b0, #6dd5ed); /* Gradient: Blue to Light Blue */
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+}
