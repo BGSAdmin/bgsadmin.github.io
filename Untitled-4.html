@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera App</title>
+    <style>
+        /* CSS styles for camera application */
+        body {
+            background: linear-gradient(to right, #6cba93, #8ecae6); /* Gradient background for a more visually stimulating look */
+            font-family: Arial, sans-serif;
+            color: #ffffff;
+            text-align: center;
+            padding: 0 10px;
+            margin: 0;
+        }
+        #header {
+            font-size: 32px;
+            font-weight: bold;
+            color: #073b4c; /* Darker shade of blue for header text */
+            margin: 20px 0;
+        }
+        #aboutUs {
+            margin-bottom: 30px;
+        }
+        #aboutUs p {
+            text-align: justify;
+            font-size: 16px;
+            line-height: 1.6;
+            margin: 0 auto;
+            max-width: 600px;
+        }
+        #cameraContainer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+        #camera {
+            width: 100%;
+            max-width: 480px; /* Set max-width for portrait mode */
+            height: 640px; /* Set height for portrait mode */
+            border: 4px solid #073b4c; /* Thicker border with darker color */
+            border-radius: 10px;
+            margin-bottom: 20px;
+            background-color: #000; /* Black background in case video feed is not available */
+        }
+        #btnContainer {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #023047; /* Button color */
+            color: #ffffff;
+            font-size: 16px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #8ecae6; /* Button hover color */
+        }
+        #products {
+            margin-bottom: 30px;
+        }
+        #products p, #products a {
+            font-size: 18px;
+            color: #073b4c;
+        }
+        #footer {
+            text-align: center;
+            font-size: 14px;
+            color: #073b4c;
+            margin-top: 20px;
+        }
+        #footer p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="header">
+        BGS GROUP
+    </div>
+    <div id="aboutUs">
+        <p>An innovation-based tech firm</p>
+    </div>
+    <div id="cameraContainer">
+        <video id="camera" autoplay playsinline></video>
+        <div id="btnContainer">
+            <button id="openCamera">Open Camera</button>
+            <button id="captureBtn">Capture</button>
+            <button id="continuousCaptureBtn">Continuous Shots</button>
+        </div>
+    </div>
+    <div id="products">
+        <p>PRODUCTS:</p>
+        <p><a href="https://www.vhumi.in" target="_blank">VHUMI</a></p>
+    </div>
+    <div id="footer">
+        <p>Contact Us:</p>
+        <p>UDYAM/MSME REG NO. - UDYAM-WB-0080197</p>
+        <p>EMAIL - director@bgsgroup.in</p>
+        <p>MOBILE - +91 9051609319</p>
+        <p>ADDRESS - Narmada Park, Parbangla, Batanagar, Maheshtala (M), Kolkata 700140</p>
+    </div>
+    <script>
+        // JavaScript code for camera functionality
+        const openCameraBtn = document.getElementById('openCamera');
+        const captureBtn = document.getElementById('captureBtn');
+        const continuousCaptureBtn = document.getElementById('continuousCaptureBtn');
+        const camera = document.getElementById('camera');
+        
+        let stream = null;
+
+        openCameraBtn.addEventListener('click', async () => {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: 'environment', 
+                        width: { ideal: 1080 },
+                        height: { ideal: 1920 }
+                    } 
+                });
+                camera.srcObject = stream;
+            } catch (err) {
+                console.error('Error accessing camera:', err);
+            }
+        });
+
+        const captureImage = (context, videoWidth, videoHeight, locationText, dateTime) => {
+            context.drawImage(camera, 0, 0, videoWidth, videoHeight);
+            context.font = '24px Arial'; // Increased font size
+            context.fillStyle = '#ffffff';
+            context.fillText(locationText, 10, videoHeight - 50); // Adjusted position
+            context.fillText(dateTime, 10, videoHeight - 20); // Adjusted position
+        }
+
+        const saveImage = (canvas) => {
+            const imageData = canvas.toDataURL('image/jpeg');
+            const downloadLink = document.createElement('a');
+            downloadLink.href = imageData;
+            downloadLink.download = 'captured_image.jpg';
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
+
+        captureBtn.addEventListener('click', async () => {
+            if (!stream) return;
+
+            navigator.geolocation.getCurrentPosition((position) => {
+                const { latitude, longitude } = position.coords;
+                const locationText = `Lat: ${latitude.toFixed(5)}, Long: ${longitude.toFixed(5)}`;
+                
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                const videoWidth = camera.videoWidth;
+                const videoHeight = camera.videoHeight;
+                canvas.width = videoWidth;
+                canvas.height = videoHeight;
+
+                captureImage(context, videoWidth, videoHeight, locationText, new Date().toLocaleString());
+                saveImage(canvas);
+            });
+        });
+
+        continuousCaptureBtn.addEventListener('click', async () => {
+            if (!stream) return;
+
+            navigator.geolocation.getCurrentPosition((position) => {
+                const { latitude, longitude } = position.coords;
+                const locationText = `Lat: ${latitude.toFixed(5)}, Long: ${longitude.toFixed(5)}`;
+                
+                let count = 0;
+                const intervalId = setInterval(() => {
+                    if (count >= 10) {
+                        clearInterval(intervalId);
+                        return;
+                    }
+
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    const videoWidth = camera.videoWidth;
+                    const videoHeight = camera.videoHeight;
+                    canvas.width = videoWidth;
+                    canvas.height = videoHeight;
+
+                    captureImage(context, videoWidth, videoHeight, locationText, new Date().toLocaleString());
+                    saveImage(canvas);
+
+                    count++;
+                }, 2000); // 2-second interval
+            });
+        });
+    </script>
+</body>
+</html>
