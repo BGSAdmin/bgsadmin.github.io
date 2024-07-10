@@ -113,10 +113,10 @@
                 max-width: 85%;
             }
             #btnContainer {
-                max-width: 90%;
+                max-width: 100%;
             }
             button {
-                width: 100%;
+                width: 25%;
             }
         }
     </style>
@@ -164,10 +164,10 @@
                 stream = await navigator.mediaDevices.getUserMedia({
                     video: {
                         facingMode: 'environment',
-                        width: { ideal: 1080 },
-                        height: { ideal: 1920 }
+                        width: { ideal: 1920 }, // Adjusted width for landscape
+                        height: { ideal: 1080 } // Adjusted height for landscape
                     },
-                    audio: true // Include audio
+                    audio: false // Include audio
                 });
                 camera.srcObject = stream;
             } catch (err) {
@@ -183,16 +183,20 @@
                 const locationText = `Lat: ${latitude.toFixed(5)}, Long: ${longitude.toFixed(5)}`;
                 const canvas = document.createElement('canvas');
                 const context = canvas.getContext('2d');
-                const videoWidth = camera.videoWidth;
-                const videoHeight = camera.videoHeight;
+                const videoWidth = camera.videoHeight; // Adjusted width for landscape
+                const videoHeight = camera.videoWidth; // Adjusted height for landscape
                 canvas.width = videoWidth;
                 canvas.height = videoHeight;
+
+                context.save();
+                context.translate(videoWidth / 2, videoHeight / 2);
+                context.drawImage(camera, -videoHeight / 2, -videoWidth / 2, videoHeight, videoWidth);
+                context.restore();
 
                 const firstName = fnameInput.value.trim();
                 const productName = lnameInput.value.trim();
                 const dateTime = new Date().toLocaleString();
 
-                context.drawImage(camera, 0, 0, videoWidth, videoHeight);
                 context.font = '24px Arial';
                 context.fillStyle = '#ffffff';
                 
