@@ -32,22 +32,13 @@
             border-radius: 5px;
             border: 1px solid #ccc;
         }
-        #aboutUs {
-            margin-bottom: 30px;
-        }
-        #aboutUs p {
-            text-align: justify;
-            font-size: 16px;
-            line-height: 1.6;
-            margin: 0 auto;
-            max-width: 600px;
-        }
         #cameraContainer {
             display: flex;
             justify-content: center;
             align-items: center;
             flex-direction: column;
             margin-bottom: 20px;
+            position: relative;
         }
         #camera {
             width: 100%;
@@ -58,6 +49,14 @@
             margin-bottom: 20px;
             background-color: #000;
             object-fit: cover;
+        }
+        #overlayCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
         }
         #timer {
             position: absolute;
@@ -133,6 +132,7 @@
     </div>
     <div id="cameraContainer">
         <video id="camera" autoplay playsinline></video>
+        <canvas id="overlayCanvas"></canvas>
         <div id="timer">0s</div>
         <div id="btnContainer">
             <button id="openCamera">Open Camera</button>
@@ -151,6 +151,8 @@
         const startRecordingBtn = document.getElementById('startRecordingBtn');
         const stopRecordingBtn = document.getElementById('stopRecordingBtn');
         const camera = document.getElementById('camera');
+        const overlayCanvas = document.getElementById('overlayCanvas');
+        const overlayContext = overlayCanvas.getContext('2d');
         const timerElement = document.getElementById('timer');
         const fnameInput = document.getElementById('fname');
         const lnameInput = document.getElementById('lname');
@@ -164,8 +166,8 @@
                 stream = await navigator.mediaDevices.getUserMedia({
                     video: {
                         facingMode: 'environment',
-                        width: { ideal: 1920 }, // Adjusted width for landscape
-                        height: { ideal: 1080 } // Adjusted height for landscape
+                        width: { ideal: 400 }, // Adjusted width for landscape
+                        height: { ideal: 700 } // Adjusted height for landscape
                     },
                     audio: false // Include audio
                 });
@@ -183,15 +185,12 @@
                 const locationText = `Lat: ${latitude.toFixed(5)}, Long: ${longitude.toFixed(5)}`;
                 const canvas = document.createElement('canvas');
                 const context = canvas.getContext('2d');
-                const videoWidth = camera.videoHeight; // Adjusted width for landscape
-                const videoHeight = camera.videoWidth; // Adjusted height for landscape
+                const videoWidth = camera.videoWidth; // Adjusted width for landscape
+                const videoHeight = camera.videoHeight; // Adjusted height for landscape
                 canvas.width = videoWidth;
                 canvas.height = videoHeight;
 
-                context.save();
-                context.translate(videoWidth / 2, videoHeight / 2);
-                context.drawImage(camera, -videoHeight / 2, -videoWidth / 2, videoHeight, videoWidth);
-                context.restore();
+                context.drawImage(camera, 0, 0, videoWidth, videoHeight);
 
                 const firstName = fnameInput.value.trim();
                 const productName = lnameInput.value.trim();
@@ -248,8 +247,43 @@
 
                 const blob = new Blob(chunks, { type: 'video/webm' });
                 const videoUrl = URL.createObjectURL(blob);
+
+                // Create a video element to display the recorded video
+                const videoElement = document.createElement('video');
+                videoElement.src = videoUrl;
+                videoElement.controls = true;
+                videoElement.style.width = '100%';
+                videoElement.style.maxWidth = '540px';
+                videoElement.style.border = '4px solid #d9c1ef';
+                videoElement.style.borderRadius = '10px';
+                videoElement.style.marginBottom = '20px';
+
+                // Append the video element to the camera container
+                const cameraContainer = document.getElementById('cameraContainer');
+                cameraContainer.appendChild(videoElement);
+
+                // Overlay details on the recorded video
+                overlayCanvas.width = videoElement.videoWidth;
+                overlayCanvas.height = videoElement.videoHeight;
+                overlayContext.drawImage(videoElement, 0, 0);
+
+                const firstName = fnameInput.value.trim();
+                const productName = lnameInput.value.trim();
+                const dateTime = new Date().toLocaleString();
+
+                overlayContext.font = '24px Arial';
+                overlayContext.fillStyle = '#ffffff';
+                
+                const textMargin = 10;
+                const lineHeight = 30;
+                overlayContext.fillText(`User: ${firstName}`, textMargin, textMargin + lineHeight);
+                overlayContext.fillText(`Product: ${productName}`, textMargin, textMargin + 2 * lineHeight);
+                overlayContext.fillText(dateTime, textMargin, videoElement.videoHeight - 20);
+
+                // Save the overlayed video
+                const overlayedVideo = overlayCanvas.toDataURL('image/jpeg');
                 const downloadLink = document.createElement('a');
-                downloadLink.href = videoUrl;
+                downloadLink.href = overlayedVideo;
                 downloadLink.download = 'captured_video.webm';
                 document.body.appendChild(downloadLink);
                 downloadLink.click();
