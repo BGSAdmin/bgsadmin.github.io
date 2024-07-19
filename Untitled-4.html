@@ -107,6 +107,9 @@
         #footer p {
             margin: 5px 0;
         }
+        #context.fillText{
+            color: #e513b1;
+        }
         @media (max-width: 768px) {
             #camera {
                 max-width: 85%;
@@ -145,6 +148,8 @@
         <p>PRODUCTS:</p>
         <p><a href="https://www.vhumi.in" target="_blank">VHUMI</a></p>
     </div>
+    <div id="context.fillText"></div>
+    
     <script>
         const openCameraBtn = document.getElementById('openCamera');
         const captureBtn = document.getElementById('captureBtn');
@@ -178,43 +183,68 @@
         });
 
         const captureImage = () => {
-            if (!stream) return;
+    if (!stream) return;
 
-            navigator.geolocation.getCurrentPosition((position) => {
-                const { latitude, longitude } = position.coords;
-                const locationText = `Lat: ${latitude.toFixed(5)}, Long: ${longitude.toFixed(5)}`;
-                const canvas = document.createElement('canvas');
-                const context = canvas.getContext('2d');
-                const videoWidth = camera.videoWidth; // Adjusted width for landscape
-                const videoHeight = camera.videoHeight; // Adjusted height for landscape
-                canvas.width = videoWidth;
-                canvas.height = videoHeight;
+    navigator.geolocation.getCurrentPosition((position) => {
+    const { latitude, longitude } = position.coords;
+    const locationText = `Lat: ${latitude.toFixed(5)}, Long: ${longitude.toFixed(5)}`;
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    const videoWidth = camera.videoWidth; // Adjusted width for landscape
+    const videoHeight = camera.videoHeight; // Adjusted height for landscape
+    canvas.width = videoWidth;
+    canvas.height = videoHeight;
 
-                context.drawImage(camera, 0, 0, videoWidth, videoHeight);
+    context.drawImage(camera, 0, 0, videoWidth, videoHeight);
 
-                const firstName = fnameInput.value.trim();
-                const productName = lnameInput.value.trim();
-                const dateTime = new Date().toLocaleString();
+    const firstName = fnameInput.value.trim();
+    const productName = lnameInput.value.trim();
+    const dateTime = new Date().toLocaleString();
 
-                context.font = '24px Arial';
-                context.fillStyle = '#ffffff';
-                
-                const textMargin = 10;
-                const lineHeight = 30;
-                context.fillText(`User: ${firstName}`, textMargin, textMargin + lineHeight);
-                context.fillText(`Product: ${productName}`, textMargin, textMargin + 2 * lineHeight);
-                context.fillText(locationText, textMargin, videoHeight - 20);
-                context.fillText(dateTime, textMargin, videoHeight - 50);
+    const textMargin = 20;
+    const lineHeight = 30;
+    const padding = 15;
 
-                const imageData = canvas.toDataURL('image/jpeg');
-                const downloadLink = document.createElement('a');
-                downloadLink.href = imageData;
-                downloadLink.download = 'captured_image.jpg';
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-                document.body.removeChild(downloadLink);
-            });
-        };
+    const textLines = [
+        `User: ${firstName}`,
+        `Product: ${productName}`,
+        locationText,
+        dateTime
+    ];
+    
+    context.font = '24px Arial';
+    context.textBaseline = 'top';
+    
+    const textWidth = textLines.reduce((max, line) => Math.max(max, context.measureText(line).width), 0);
+    const backgroundHeight = textLines.length * lineHeight + padding * 2;
+    const backgroundY = videoHeight - backgroundHeight - textMargin;
+    
+    // Draw semi-transparent gradient background
+    const gradient = context.createLinearGradient(0, backgroundY, 0, backgroundY + backgroundHeight);
+    gradient.addColorStop(0, '#F0F8FF'); 
+    gradient.addColorStop(1, '#F0F8FF'); 
+    context.globalAlpha=0.3;
+    context.fillStyle = gradient;
+    context.fillRect(0, backgroundY, videoWidth, backgroundHeight);
+
+    // Draw text
+    context.fillStyle = '#141414';
+    textLines.forEach((line, index) => {
+        context.fillText(line, textMargin, backgroundY + padding + index * lineHeight);
+    });
+
+    // Convert canvas content to data URL for image download
+    const imageData = canvas.toDataURL('image/jpeg');
+    const downloadLink = document.createElement('a');
+    downloadLink.href = imageData;
+    downloadLink.download = 'captured_image.jpg';
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+});
+
+};
+
 
         captureBtn.addEventListener('click', captureImage);
 
