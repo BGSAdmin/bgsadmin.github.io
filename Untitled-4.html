@@ -224,7 +224,7 @@
                         dateTime
                     ];
         
-                    context.font = '24px Arial';
+                    context.font = 'bold 24px Arial';
                     context.textBaseline = 'top';
         
                     const textWidth = textLines.reduce((max, line) => Math.max(max, context.measureText(line).width), 0);
@@ -248,7 +248,7 @@
                         context.globalAlpha = 1.0; // Reset opacity
                         context.drawImage(logo, textMargin, backgroundY + padding, logoWidth, logoHeight); // Place logo inside the background
         
-                        context.fillStyle = '#434343';
+                        context.fillStyle = '#ffffff';
                         textLines.forEach((line, index) => {
                             context.fillText(line, textMargin + logoWidth + 10, backgroundY + padding + index * lineHeight); // Adjust text position to accommodate logo
                         });
@@ -320,7 +320,7 @@
                     const productName = lnameInput.value.trim();
                     const dateTime = new Date().toLocaleString();
         
-                    overlayContext.font = '15px Arial';
+                    overlayContext.font = 'bold 15px Arial';
                     overlayContext.fillStyle = '#ffffff';
         
                     const textMargin = 10;
@@ -374,3 +374,4 @@
         
     </body>
     </html>
+    
