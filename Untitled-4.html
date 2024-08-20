@@ -248,7 +248,7 @@
                         context.globalAlpha = 1.0; // Reset opacity
                         context.drawImage(logo, textMargin, backgroundY + padding, logoWidth, logoHeight); // Place logo inside the background
         
-                        context.fillStyle = '#ffffff';
+                        context.fillStyle = '#0519f2';
                         textLines.forEach((line, index) => {
                             context.fillText(line, textMargin + logoWidth + 10, backgroundY + padding + index * lineHeight); // Adjust text position to accommodate logo
                         });
@@ -335,8 +335,8 @@
                     const logo = new Image();
                     logo.src = 'Mask group.png'; // Replace with the path to your logo image
                     logo.onload = () => {
-                        const logoWidth = 60; // Adjust as needed
-                        const logoHeight = 60; // Adjust as needed
+                        const logoWidth = 60; 
+                        const logoHeight = 60; 
                         const backgroundY = videoElement.videoHeight - (textLines.length * lineHeight + padding * 2) - textMargin; // Ensure backgroundY is calculated here
         
                         overlayContext.drawImage(logo, textMargin, backgroundY + padding, logoWidth, logoHeight); // Place logo inside the background
@@ -374,4 +374,3 @@
         
     </body>
     </html>
-    
